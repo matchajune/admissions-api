@@ -68,8 +68,8 @@ server.route({
       }
       // else student didn't apply and need to input to system
       else {
-        student = helpers.add(student, params);
-        college = helpers.add(college, params);
+        student = helpers.addSort(student, params);
+        college = helpers.addSort(college, params);
 
         reply({
           statusCode: 200,

@@ -1,7 +1,7 @@
 'use strict';
 
 var exports = module.exports = {
-  add: (object, params) => {
+  addSort: (object, params) => {
     let isStudentObject = object.id === 'student';
     let name            = isStudentObject ? params.name : params.college;
     let saveParams      = isStudentObject ? {college: params.college} : {name: params.name};
