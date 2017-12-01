@@ -1,7 +1,7 @@
 'use strict';
 
-const Hapi    = require('hapi');
-var routes    = require('./routes.js');
+const Hapi = require('hapi');
+var routes = require('./routes.js');
 
 // create server
 const server = new Hapi.Server();
