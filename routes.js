@@ -77,13 +77,14 @@ module.exports = [
     method: 'GET',
     path: '/colleges/{name}',
     handler: (request, reply) => {
-      let name = college[request.params.name];
-      if (!name) {
+      let paramsName = request.params.name;
+      let collegeName = college[paramsName];
+      if (!collegeName) {
         reply(Boom.notFound('No applications exist for that college.'));
       } else {
         reply({
-          college: request.params.name,
-          applications: name
+          college: paramsName,
+          applications: collegeName
         });
       }
     }
@@ -93,7 +94,7 @@ module.exports = [
     method: 'POST',
     path: '/backup',
     handler: (request, reply) => {
-      fs.writeFile(fileName, JSON.stringify(helpers.objectWithoutId(college)), (err) => {
+      fs.writeFile(fileName, JSON.stringify(helpers.objectWithoutId(college)), err => {
         if (err) {
           reply(Boom.expectationFailed('Should have saved...but failed.'));
         } else {
