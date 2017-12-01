@@ -30,7 +30,7 @@ server.route({
   method: 'GET',
   path: '/applicants',
   handler: (request, reply) => {
-    reply(student);
+    reply(helpers.objectWithoutId(student));
   }
 })
 
@@ -39,9 +39,13 @@ server.route({
   method: 'GET',
   path: '/applicants/{name}',
   handler: (request, reply) => {
-    let queryName   = request.params.name;
-    let studentInfo = student[queryName];
-    studentInfo ? reply(studentInfo) : reply(Boom.notFound('No applicants exist for that name.'));
+    let queryName    = request.params.name;
+    let applications = student[queryName];
+    let studentInfo  = {
+      name: queryName,
+      applications: applications
+    };
+    applications ? reply(studentInfo) : reply(Boom.notFound('No applications exist for that name.'));
   }
 })
 
@@ -52,17 +56,21 @@ server.route({
   handler: (request, reply) => {
     Joi.validate(request.payload, Schema, (err, value) => {
       let params = request.payload;
+      // check if a student has an application AND check if the student already submitted
       let applied = student[params.name] && student[params.name].findIndex(obj => obj.college === params.college) !== -1;
+      // if payload doesn't equal schema
       if (err) {
         reply(Boom.badRequest('College, name, and score ALL required.'));
       }
+      // else if student already applied
       else if (applied) {
         reply(Boom.badRequest('Application already submitted for this college/name pair.'));
       }
+      // else student didn't apply and need to input to system
       else {
-        student = helpers.addSort(student, params);
-        college = helpers.addSort(college, params);
-        console.log(student)
+        student = helpers.add(student, params);
+        college = helpers.add(college, params);
+
         reply({
           statusCode: 200,
           message: 'Application submitted successfully.'
@@ -77,7 +85,7 @@ server.route({
   method: 'GET',
   path: '/colleges',
   handler: (request, reply) => {
-    reply(college);
+    reply(helpers.objectWithoutId(college));
   }
 })
 
@@ -103,11 +111,9 @@ server.route({
   method: 'POST',
   path: '/backup',
   handler: (request, reply) => {
-    let objectCopy = Object.assign({}, college);
-    delete objectCopy.id;
-    fs.writeFile(FileName, JSON.stringify(objectCopy), err => {
+    fs.writeFile(FileName, JSON.stringify(helpers.objectWithoutId(college)), (err) => {
       if (err) {
-        reply(Boom.expectationFailed('Should have saved...but something happened.'));
+        reply(Boom.expectationFailed('Should have saved...but failed.'));
       } else {
         reply({
           statusCode: 200,

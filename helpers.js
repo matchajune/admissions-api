@@ -1,16 +1,17 @@
 'use strict';
 
 var exports = module.exports = {
-  addSort: (klass, params) => {
-    let forStudent = klass.id === 'student';
-    let name = forStudent ? params.name : params.college;
-    let saveParams = forStudent ? {college: params.college} : {name: params.name};
-    saveParams.score = params.score;
-    if (!klass[name]) {
-      klass[name] = [];
-    }
-    klass[name].push(saveParams);
-    klass[name] = klass[name].sort((a,b) => {
+  add: (object, params) => {
+    let isStudentObject = object.id === 'student';
+    let name            = isStudentObject ? params.name : params.college;
+    let saveParams      = isStudentObject ? {college: params.college} : {name: params.name};
+    saveParams.score    = params.score;
+    // create new array container if one doesn't already exist
+    object[name] = object[name] || [];
+    // save the params into array
+    object[name].push(saveParams);
+    // sort by score
+    object[name] = object[name].sort((a,b) => {
       if (a.score < b.score) {
         return 1;
       }
@@ -19,6 +20,12 @@ var exports = module.exports = {
       }
       return 0;
     });
-    return klass;
+
+    return object;
+  },
+  objectWithoutId: (object) => {
+    let objectCopy = Object.assign({}, object);
+    delete object.id;
+    return objectCopy;
   }
 };
